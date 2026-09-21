@@ -15,20 +15,25 @@ function App() {
   }, [])
 
   return (
-    <div>
-      <h1>WildGuard AI</h1>
+    <div className="app">
+      <header className="header">
+        <h1>WildGuard AI</h1>
+        <p>
+          AI-Powered Wildlife Habitat Threat Prediction and
+          Real-Time Conservation Monitoring System
+        </p>
+      </header>
 
-      <p>
-        AI-Powered Wildlife Habitat Threat Prediction
-        and Real-Time Conservation Monitoring System
-      </p>
+      <main className="dashboard">
+        <div className="status-card">
+          <h2>System Status</h2>
+          <p>Wildlife conservation risk monitoring dashboard</p>
 
-      <p>Wildlife conservation risk monitoring dashboard</p>
-
-      <hr />
-
-      <h2>Backend Status</h2>
-      <p>{backendMessage}</p>
+          <p className="status">
+            Backend: {backendMessage}
+          </p>
+        </div>
+      </main>
     </div>
   )
 }

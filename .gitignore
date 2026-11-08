@@ -1,15 +1,29 @@
+
 # Python
 __pycache__/
 *.py[cod]
 *.pyo
+.pytest_cache/
+.mypy_cache/
 
-# Virtual environment
+# Virtual environments
 venv/
 .venv/
+backend/venv/
 
-# Environment variables
+# Environment variables and credentials
 .env
 .env.*
+!.env.example
+*credentials*
+*secret*
+*token*
+
+# Frontend dependencies and builds
+node_modules/
+frontend/node_modules/
+frontend/dist/
+dist/
 
 # Jupyter
 .ipynb_checkpoints/
@@ -17,10 +31,69 @@ venv/
 # Machine learning artifacts
 *.pkl
 *.joblib
+*.h5
+*.keras
 
-# OS files
+# Raw datasets - keep local
+data/raw/
+
+# Large wildlife output - keep local
+data/processed/wildlife/bandipur_wildlife_observations.geojson
+
+# Temporary and generated files
+*.log
+*.tmp
+
+# OS and editor files
 .DS_Store
 Thumbs.db
-
-# VS Code
 .vscode/
+
+# Keep the datasets required by the backend
+!data/processed/spatial/bandipur_risk_classified.gpkg
+!data/processed/wildlife/bandipur_wildlife_observations.csv
+!data/processed/weather/monthly_weather_summary.csv
+# Keep only final processed outputs in GitHub
+data/processed/*
+
+# Fire outputs
+!data/processed/fire/
+data/processed/fire/*
+!data/processed/fire/bandipur_fire_detection_map.png
+!data/processed/fire/bandipur_fire_detections.csv
+!data/processed/fire/monthly_fire_detections.png
+!data/processed/fire/monthly_fire_summary.csv
+!data/processed/fire/yearly_fire_detections.png
+!data/processed/fire/yearly_fire_summary.csv
+
+# Final spatial risk outputs
+!data/processed/spatial/
+data/processed/spatial/*
+!data/processed/spatial/bandipur_risk_classified.gpkg
+!data/processed/spatial/maps/
+data/processed/spatial/maps/*
+!data/processed/spatial/maps/bandipur_fire_threat_map.png
+!data/processed/spatial/maps/bandipur_human_access_pressure_map.png
+!data/processed/spatial/sensitivity_analysis_summary.csv
+
+# Final weather output
+!data/processed/weather/
+data/processed/weather/*
+!data/processed/weather/monthly_weather_summary.csv
+
+# Final wildlife outputs
+!data/processed/wildlife/
+data/processed/wildlife/*
+!data/processed/wildlife/bandipur_wildlife_observations.csv
+!data/processed/wildlife/charts/
+data/processed/wildlife/charts/*
+!data/processed/wildlife/charts/wildlife_mammal_species.png
+!data/processed/wildlife/charts/wildlife_top_bird_families.png
+!data/processed/wildlife/charts/wildlife_top_bird_orders.png
+!data/processed/wildlife/charts/wildlife_yearly_observations.png
+!data/processed/wildlife/wildlife_mammal_species.csv
+!data/processed/wildlife/wildlife_quality_summary.csv
+!data/processed/wildlife/wildlife_source_year_summary.csv
+!data/processed/wildlife/wildlife_top_bird_families.csv
+!data/processed/wildlife/wildlife_top_bird_orders.csv
+!data/processed/wildlife/wildlife_yearly_summary.csv

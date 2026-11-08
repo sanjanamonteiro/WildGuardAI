@@ -1,0 +1,9 @@
+metric,value
+total_observations,28759
+unique_species,311
+bird_observations,28727
+mammal_observations,32
+missing_species_names,0
+duplicate_gbif_ids,0
+duplicate_occurrence_ids,0
+missing_coordinate_uncertainty,28721

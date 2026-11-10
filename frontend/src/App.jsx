@@ -213,7 +213,7 @@ function App() {
       .catch((err) => setWeatherError(err.message))
   }, [])
 
-  const features = geoData?.features || []
+  const features = useMemo(() => geoData?.features || [], [geoData])
 
   const stats = useMemo(() => {
     const fireCounts = {

@@ -1,141 +1,215 @@
 # WildGuard AI – System Architecture
 
-## 1. Project Overview
+## 1. Overview
 
-WildGuard AI is an AI-powered wildlife habitat threat assessment and conservation monitoring system designed for the Bandipur Tiger Reserve region in Karnataka, India.
+WildGuard AI is a wildlife habitat threat assessment and conservation monitoring system developed for Bandipur Tiger Reserve, Karnataka, India.
 
-The system integrates wildlife observations, fire detections, vegetation information, road networks, settlement locations, and weather records to support spatial analysis of potential habitat threats.
+The system integrates spatial, environmental, fire detection, wildlife observation, and human-access datasets to assess relative habitat threats and present the processed information through an interactive web dashboard.
 
-The project currently uses processed datasets and rule-based risk scoring to identify areas with relatively higher fire threat and human access pressure.
+The application follows a three-layer architecture:
+
+1. Data Processing Layer
+2. Backend API Layer
+3. Frontend Visualization Layer
 
 ## 2. System Architecture
 
-The application consists of three main layers:
+```mermaid
+flowchart TD
+    A["Environmental and Spatial Data Sources"] --> B["Data Processing Layer"]
+    B --> C["Processed GeoPackage and CSV Datasets"]
+    C --> D["FastAPI Backend"]
+    D --> E["REST API Endpoints"]
+    E --> F["React Frontend"]
+    F --> G["Interactive Bandipur Risk Map"]
+    F --> H["Wildlife Observation Dashboard"]
+    F --> I["Weather Intelligence Dashboard"]
+    F --> J["Conservation Overview"]
+```
 
-1. **Data Processing and Analysis Layer**
-2. **Backend API Layer**
-3. **Frontend Visualization Layer**
+## 3. Data Processing Layer
 
-### 2.1 Data Processing and Analysis Layer
+The data processing layer prepares and integrates datasets required for spatial threat assessment and conservation monitoring.
 
-This layer collects, processes, and integrates environmental and geographical datasets.
+### 3.1 Data Sources
 
-The project uses the following data sources:
+The project uses the following datasets:
 
-- GBIF wildlife occurrence records.
-- NASA FIRMS satellite-based fire detections.
+- NASA FIRMS VIIRS satellite fire detections.
+- GBIF wildlife occurrence and observation records.
+- OpenStreetMap roads and settlement information.
+- ESA WorldCover 2021 land-cover data.
 - NASA POWER weather data.
-- ESA WorldCover land-cover data.
-- OpenStreetMap road and settlement data.
 - Bandipur Tiger Reserve boundary data.
 
-Python scripts perform data cleaning, coordinate processing, spatial grid creation, dataset integration, risk scoring, classification, and visualization.
+### 3.2 Data Processing
 
-The study area is divided into approximately 1 km spatial grid cells for geographical analysis.
+Python scripts are used to perform:
 
-### 2.2 Risk Assessment
+- Data cleaning and preprocessing.
+- Spatial data integration.
+- Coordinate reference system transformation.
+- Creation of a 1 km spatial grid.
+- Integration of fire, wildlife, vegetation, road, settlement, and weather information.
+- Calculation of spatial threat scores.
+- Classification of relative threat levels.
+- Generation of summary datasets and visualizations.
 
-The current risk assessment focuses on two dimensions:
+The main spatial dataset is stored in GeoPackage format. Processed wildlife, weather, and fire summaries are stored in CSV format.
+
+### 3.3 Spatial Risk Assessment
+
+The system calculates two principal threat indicators:
 
 **Fire Threat Assessment**
-- Fire detection frequency.
-- Mean Fire Radiative Power (FRP).
-- Normalized fire threat scoring.
+
+Fire threat scores combine normalized fire detection counts and mean Fire Radiative Power (FRP), using expert-defined weights.
 
 **Human Access Pressure Assessment**
-- Road density.
-- Distance to the nearest settlement.
-- Normalized human access scoring.
 
-The component scores are combined using expert-defined weights and classified into relative Low, Moderate, and High categories.
+Human-access scores combine road density and proximity to settlements, using expert-defined weights.
 
-These categories represent relative threat levels within the study area. They are not validated probabilities of future incidents.
+The resulting scores are classified into relative Low, Moderate, and High categories using tertile-based thresholds.
 
-### 2.3 Backend API Layer
+These scores represent relative spatial threat indicators. They are not statistically trained predictions or probabilities of future incidents.
+
+## 4. Backend API Layer
 
 The backend is developed using Python and FastAPI.
 
-It provides API endpoints to supply processed data to the frontend.
+It reads the processed GeoPackage and CSV datasets and exposes REST API endpoints to the frontend.
 
-Current endpoints include:
+### 4.1 Technology Stack
 
-| Endpoint | Purpose |
-|---|---|
-| `/api/health` | Checks API availability |
-| `/api/risk-map` | Provides spatial risk classification data |
-| `/api/wildlife-summary` | Provides wildlife observation summaries |
-| `/api/weather-summary` | Provides weather summary information |
+- Python
+- FastAPI
+- Uvicorn
+- Pandas
+- GeoPandas
 
-The backend reads the final processed datasets from the project's `data/processed/` directory.
+### 4.2 API Endpoints
 
-### 2.4 Frontend Visualization Layer
+| Endpoint | Method | Purpose |
+|---|---|---|
+| `/` | GET | Confirms that the backend is running. |
+| `/api/health` | GET | Returns backend health information. |
+| `/api/risk-map` | GET | Provides spatial risk information in GeoJSON format. |
+| `/api/wildlife-summary` | GET | Provides wildlife observation statistics and annual summaries. |
+| `/api/weather-summary` | GET | Provides monthly weather summaries and latest available weather indicators. |
+
+The backend uses cached data-loading functions to avoid repeatedly reading the same processed datasets.
+
+The risk map endpoint converts the spatial dataset to EPSG:4326 before returning GeoJSON data for frontend mapping.
+
+## 5. Frontend Visualization Layer
 
 The frontend is developed using React and Vite.
 
-It provides the dashboard interface through which users can explore the available conservation and habitat-threat information.
+It communicates with the FastAPI backend through HTTP requests and displays the processed information through an interactive dashboard.
 
-The interface uses:
-- React components for the dashboard.
-- CSS for styling and layout.
-- Leaflet and React Leaflet for geographical visualization.
-- Backend API requests to retrieve processed information.
+### 5.1 Technology Stack
 
-The dashboard presents spatial risk information, wildlife summaries, and weather information.
+- React
+- React DOM
+- Vite
+- React Leaflet
+- Leaflet
+- JavaScript
+- CSS
 
-## 3. Data Flow
+### 5.2 Dashboard Components
 
-The overall data flow is:
+**Conservation Overview**
 
-1. Collect environmental, wildlife, fire, and geographical datasets.
-2. Clean and preprocess the collected datasets.
-3. Integrate relevant datasets using spatial analysis.
-4. Generate spatial grid cells across the study area.
-5. Calculate fire threat and human access pressure scores.
-6. Classify the resulting scores into relative risk categories.
-7. Store the final processed outputs.
-8. Serve the processed information through the FastAPI backend.
-9. Retrieve and visualize the information through the React frontend.
+Displays key conservation and fire detection statistics.
 
-## 4. Technology Stack
+**Bandipur Spatial Risk Map**
 
-| Component | Technologies |
+Displays the spatial risk grid on an interactive map. Users can switch between:
+
+- Fire Threat
+- Human Access Pressure
+
+Map features display information about their corresponding risk categories, scores, and fire detections.
+
+**Wildlife Observation Intelligence**
+
+Displays:
+
+- Total recorded wildlife observations.
+- Number of unique recorded species.
+- Observation class distribution.
+- Annual wildlife observation trends.
+
+**Weather Intelligence**
+
+Displays the latest available temperature, humidity, and rainfall indicators, along with monthly weather trend charts.
+
+**Data Interpretation Notes**
+
+Provides important information about dataset coverage, interpretation, and limitations to support responsible use of the dashboard.
+
+## 6. Frontend–Backend Data Flow
+
+The frontend communicates with the backend at:
+
+`http://127.0.0.1:8000`
+
+When the dashboard loads, React's `useEffect` hook initiates requests to the following endpoints:
+
+1. `/api/risk-map` retrieves spatial risk data.
+2. `/api/wildlife-summary` retrieves wildlife statistics.
+3. `/api/weather-summary` retrieves monthly weather information.
+
+The backend returns the processed data as JSON responses.
+
+The frontend uses React state to manage the retrieved information. React Leaflet renders the spatial GeoJSON data, while custom JavaScript and SVG components display the dashboard charts.
+
+Loading and error states are handled for the wildlife and weather sections.
+
+## 7. Data Storage
+
+The system uses processed local datasets rather than a live operational database.
+
+| Data | Storage Format |
 |---|---|
-| Programming | Python, JavaScript |
-| Data Processing | Pandas, GeoPandas |
-| Geospatial Analysis | GeoPandas, Shapely, Rasterio |
-| Backend | FastAPI |
-| Frontend | React, Vite, CSS |
-| Mapping | Leaflet, React Leaflet |
-| Data Visualization | Matplotlib |
-| Data Formats | CSV, GeoJSON, GeoPackage, GeoTIFF |
-| Version Control | Git, GitHub |
+| Classified spatial risk grid | GeoPackage |
+| Wildlife observations | CSV |
+| Monthly weather summaries | CSV |
+| Fire detection records and summaries | CSV |
+| Additional analysis summaries | CSV |
 
-## 5. Current Implementation Scope
+The backend reads these processed files and provides the required information through API endpoints.
 
-The current implementation supports:
+## 8. Testing
 
-- Historical wildlife observation analysis.
-- Satellite fire detection analysis.
-- Land-cover and vegetation analysis.
-- Road and settlement accessibility analysis.
-- Weather data summaries.
-- Spatial risk scoring and classification.
-- Sensitivity analysis of risk scoring.
-- Interactive dashboard visualization.
+The backend API is tested using Pytest and HTTPX.
 
-## 6. Limitations and Future Enhancements
+The automated test suite covers five endpoints:
 
-The current system is based primarily on historical and preprocessed datasets. It does not yet provide continuous live satellite monitoring or validated predictions of future wildlife threats.
+- Root endpoint.
+- Health check endpoint.
+- Risk map endpoint.
+- Wildlife summary endpoint.
+- Weather summary endpoint.
 
-Potential future enhancements include:
+These tests verify that the API endpoints return the expected responses using the available processed datasets.
 
-- Automated ingestion of updated satellite and environmental data.
-- Integration of additional wildlife monitoring sources.
-- Machine learning models for validated predictive tasks.
-- Time-based habitat threat monitoring.
-- Automated alerts for newly detected environmental changes.
-- Expanded conservation monitoring and reporting features.
+## 9. System Limitations
 
-## 7. Project Goal
+The system has the following limitations:
 
-The overall goal of WildGuard AI is to combine geospatial analytics, environmental datasets, and interactive visualization to support evidence-based wildlife habitat monitoring and conservation planning in the Bandipur Tiger Reserve region.
+- Satellite fire detections represent thermal anomalies and are not necessarily confirmed fire incidents.
+- Fire Radiative Power is an indicator of fire intensity and does not represent burned area.
+- Wildlife occurrence records are opportunistic observations and cannot be treated as population estimates.
+- Wildlife observation coverage varies across years and data sources.
+- Human-access pressure is estimated using roads and settlements as indirect indicators, not direct measurements of human activity or wildlife conflict.
+- NASA POWER weather information represents a study-area reference point rather than individual measurements for every spatial grid cell.
+- Risk scores use expert-defined weights and relative classification thresholds.
+- The dashboard presents processed datasets and does not currently perform continuous live monitoring or automated future threat prediction.
+
+## 10. Conclusion
+
+WildGuard AI integrates environmental and spatial datasets through a Python-based processing pipeline, exposes the processed information through a FastAPI backend, and presents the results using a React-based interactive dashboard.
+
+The three-layer architecture supports spatial threat assessment, wildlife observation analysis, and weather intelligence for conservation monitoring in Bandipur Tiger Reserve.
